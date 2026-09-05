@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  user_id       BigInt   @id @default(autoincrement())
+  name          String   @db.VarChar(120)
+  username      String   @unique @db.VarChar(60)
+  email         String   @unique @db.VarChar(160)
+  password_hash String
+  role          String   @default("customer") @db.VarChar(20)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  cart   Cart?
+  orders Order[]
+
+  @@map("users")
+}
+
+model Category {
+  category_id BigInt    @id @default(autoincrement())
+  name        String    @unique @db.VarChar(120)
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  product_id     BigInt   @id @default(autoincrement())
+  name           String   @db.VarChar(200)
+  description    String?
+  price          Decimal  @db.Decimal(10, 2)
+  stock_quantity Int      @default(0)
+  image_url      String?
+  category_id    BigInt?
+  sku            String?  @unique @db.VarChar(80)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  category   Category?   @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([category_id])
+  @@map("products")
+}
+
+model Cart {
+  cart_id    BigInt   @id @default(autoincrement())
+  user_id    BigInt   @unique
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  user  User       @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  cart_item_id BigInt @id @default(autoincrement())
+  cart_id      BigInt
+  product_id   BigInt
+  quantity     Int    @default(1)
+
+  cart    Cart    @relation(fields: [cart_id], references: [cart_id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+
+  @@unique([cart_id, product_id])
+  @@map("cart_items")
+}
+
+model Order {
+  order_id     BigInt   @id @default(autoincrement())
+  user_id      BigInt
+  total_amount Decimal  @db.Decimal(10, 2)
+  status       String   @default("pending") @db.VarChar(20)
+  order_date   DateTime @default(now()) @db.Timestamptz(6)
+
+  user  User        @relation(fields: [user_id], references: [user_id], onDelete: Restrict)
+  items OrderItem[]
+
+  @@index([user_id])
+  @@map("orders")
+}
+
+model OrderItem {
+  order_item_id     BigInt  @id @default(autoincrement())
+  order_id          BigInt
+  product_id        BigInt
+  quantity          Int
+  price_at_purchase Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [product_id], onDelete: Restrict)
+
+  @@index([order_id])
+  @@index([product_id])
+  @@map("order_items")
+}
