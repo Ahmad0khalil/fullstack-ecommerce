@@ -31,7 +31,7 @@ export default async function RootLayout({
       className={`${fontSans.variable} ${fontSans.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <NextTopLoader color="#ffffff" height={4} showSpinner={false} />
+        <NextTopLoader color="#2563eb" height={3} showSpinner={false} />
         <div className="flex min-h-screen flex-col bg-background text-foreground">
           <ThemeProvider>
             <Header user={user?.data} />

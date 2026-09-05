@@ -9,6 +9,7 @@ import productRoutes from './routes/product.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import cartRoutes from './routes/cart.routes.js';
+import contactRoutes from './routes/contact.routes.js';
 
 // Import Middleware & Config
 import { errorHandler } from './middlewares/errorHandler.js';
@@ -43,6 +44,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/carts', cartRoutes);
+app.use('/api/contact', contactRoutes);
 
 // 4. Global Error Handler (MUST be after routes)
 app.use(errorHandler);
